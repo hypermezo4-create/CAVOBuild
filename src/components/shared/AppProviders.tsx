@@ -4,8 +4,7 @@ import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 import type { AppUser, CartItem, ThemeMode } from '@/types';
 import { loadCart, saveCart } from '@/services/cart';
-import { firebaseAuth } from '@/lib/firebase';
-import { onAuthStateChanged, signOut, type User } from 'firebase/auth';
+import { clearUserSession, loadUserSession } from '@/services/session';
 
 type AppContextType = {
   theme: ThemeMode;
@@ -20,16 +19,6 @@ type AppContextType = {
 
 const AppContext = createContext<AppContextType | null>(null);
 
-function mapFirebaseUser(user: User): AppUser {
-  return {
-    uid: user.uid,
-    name: user.displayName || user.email?.split('@')[0] || 'CAVO Client',
-    email: user.email || '',
-    provider: user.providerData[0]?.providerId || 'password',
-    avatarUrl: user.photoURL,
-  };
-}
-
 export function AppProviders({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<ThemeMode>('dark');
   const [user, setUser] = useState<AppUser | null>(null);
@@ -43,12 +32,14 @@ export function AppProviders({ children }: { children: ReactNode }) {
     document.documentElement.dataset.theme = nextTheme;
     setCart(loadCart());
 
-    const unsubscribe = onAuthStateChanged(firebaseAuth, (nextUser) => {
-      setUser(nextUser ? mapFirebaseUser(nextUser) : null);
+    const syncUser = () => {
+      setUser(loadUserSession());
       setIsAuthReady(true);
-    });
+    };
 
-    return () => unsubscribe();
+    syncUser();
+    window.addEventListener('cavo:user-change', syncUser as EventListener);
+    return () => window.removeEventListener('cavo:user-change', syncUser as EventListener);
   }, []);
 
   const setTheme = (nextTheme: ThemeMode) => {
@@ -58,7 +49,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
   };
 
   const logout = async () => {
-    await signOut(firebaseAuth);
+    clearUserSession();
     setUser(null);
   };
 

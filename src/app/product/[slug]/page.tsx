@@ -15,12 +15,21 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
 
   return (
     <main className="page stack-xl product-page-shell">
-      <PageHeader title={product.title} subtitle={`${product.brand} • ${product.variant}`} backHref="/categories" />
-      <section className="gallery-stack">
-        <article className="hero-gallery glass-card product-hero-card"><img src={product.images[0]} alt={product.title} /></article>
-        <div className="thumb-row">{product.images.slice(1, 5).map((image) => <article key={image} className="thumb-card glass-card"><img src={image} alt={product.title} loading="lazy" /></article>)}</div>
+      <PageHeader title="التفاصيل" subtitle={`${product.brand} • ${product.variant}`} backHref="/categories" />
+      <section className="gallery-stack product-gallery-shell">
+        <article className="hero-gallery glass-card product-hero-card">
+          <img src={product.images[0]} alt={product.title} />
+        </article>
+        <div className="thumb-row">
+          {product.images.slice(1, 5).map((image) => (
+            <article key={image} className="thumb-card glass-card">
+              <img src={image} alt={product.title} loading="lazy" />
+            </article>
+          ))}
+        </div>
       </section>
-      <section className="glass-card product-details stack-lg">
+
+      <section className="glass-card product-details stack-lg product-details-premium">
         <div className="product-title-row">
           <div>
             <p className="eyebrow">{product.brand}</p>
@@ -29,16 +38,26 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
           </div>
           <span className="tag hot">-{product.discount}%</span>
         </div>
-        <div className="price-block"><strong>{product.price.toLocaleString()} EGP</strong><span>{product.originalPrice.toLocaleString()} EGP</span></div>
-        <p className="muted">{product.description}</p>
-        <div className="detail-grid">
+
+        <div className="price-block price-block-inline">
+          <strong>{product.price.toLocaleString()} EGP</strong>
+          <span>{product.originalPrice.toLocaleString()} EGP</span>
+        </div>
+
+        <p className="muted product-body-copy">{product.description}</p>
+
+        <div className="detail-grid detail-grid-premium">
           <div className="glass-subcard"><span>القسم</span><strong>{product.category === 'men' ? 'رجالي' : product.category === 'women' ? 'حريمي' : 'أطفال'}</strong></div>
           <div className="glass-subcard"><span>التوفر</span><strong>{product.stock} قطع</strong></div>
           <div className="glass-subcard"><span>ألوان</span><strong>{product.colors.join(' • ')}</strong></div>
           <div className="glass-subcard"><span>المقاسات</span><strong>{product.sizes.join(' / ')}</strong></div>
         </div>
       </section>
-      <section className="stack-lg"><div className="section-title"><h2>مشابه ليك</h2></div><ProductGrid items={related} /></section>
+
+      <section className="stack-lg">
+        <div className="section-title"><h2>مناسب ليك</h2></div>
+        <ProductGrid items={related} />
+      </section>
       <AddToCartBar product={product} />
     </main>
   );

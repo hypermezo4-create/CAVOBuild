@@ -13,10 +13,11 @@ export function AccountPanel() {
 
   if (!user) {
     return (
-      <section className="glass-card empty-state">
-        <h2>سجل دخولك</h2>
-        <p className="muted">دخول سريع عبر Firebase علشان تتابع الطلبات والروابط وتجهز حسابك.</p>
-        <Link href="/auth" className="primary-button">تسجيل الدخول</Link>
+      <section className="glass-card empty-state account-empty-card">
+        <div className="brand-mark big"><img src="/brand/cavo-logo-circle.png" alt="CAVO" /></div>
+        <h2>حساب CAVO</h2>
+        <p className="muted">جهز حسابك بسرعة علشان تحفظ السلة وتكمل الطلبات. الربط الحقيقي هيتفعل بعد تثبيت النسخة النهائية.</p>
+        <Link href="/auth" className="primary-button">افتح الحساب</Link>
       </section>
     );
   }
@@ -26,18 +27,18 @@ export function AccountPanel() {
       <section className="profile-card glass-card">
         <div className="brand-mark big"><img src="/brand/cavo-logo-circle.png" alt="CAVO" /></div>
         <div>
-          <p className="eyebrow">{user.provider || 'firebase'}</p>
+          <p className="eyebrow">CAVO Client</p>
           <h2>{user.name}</h2>
           <p className="muted">{user.email}</p>
         </div>
       </section>
       <section className="info-list glass-card">
-        <div><span>اللغة</span><strong>العربية / English</strong></div>
-        <div><span>الثيم</span><strong>Dark افتراضي + Light اختياري</strong></div>
-        <div><span>الروابط</span><strong>{SOCIAL_LINKS.length} قنوات جاهزة</strong></div>
+        <div><span>الثيم</span><strong>Black / Gold افتراضي</strong></div>
+        <div><span>الروابط</span><strong>{SOCIAL_LINKS.length} قنوات رسمية</strong></div>
+        <div><span>الأسعار</span><strong>من 2000 إلى 2900</strong></div>
       </section>
       <Link href="/links" className="ghost-button full">فتح الروابط</Link>
-      <Link href="/upload" className="ghost-button full">رفع صورة / فيديو</Link>
+      <Link href="/cart" className="ghost-button full">عرض السلة</Link>
       <button type="button" className="ghost-button full" onClick={() => void logout()}>تسجيل الخروج</button>
     </div>
   );
