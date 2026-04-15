@@ -5,7 +5,7 @@ import type { ReactNode } from 'react';
 import type { AppUser, CartItem, ThemeMode } from '@/types';
 import { loadCart, saveCart } from '@/services/cart';
 import { firebaseAuth } from '@/lib/firebase';
-import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { onAuthStateChanged, signOut, type User } from 'firebase/auth';
 
 type AppContextType = {
   theme: ThemeMode;
@@ -20,7 +20,7 @@ type AppContextType = {
 
 const AppContext = createContext<AppContextType | null>(null);
 
-function mapFirebaseUser(user: NonNullable<Parameters<Parameters<typeof onAuthStateChanged>[1]>[0]>): AppUser {
+function mapFirebaseUser(user: User): AppUser {
   return {
     uid: user.uid,
     name: user.displayName || user.email?.split('@')[0] || 'CAVO Client',
