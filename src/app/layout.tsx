@@ -5,13 +5,16 @@ import { AppProviders } from '@/components/shared/AppProviders';
 
 export const metadata: Metadata = {
   title: 'CAVO',
-  description: 'Luxury sneaker app built for mobile-first premium shopping.',
+  description: 'CAVO premium footwear app — black and gold mobile experience.',
+  applicationName: 'CAVO',
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="ar" dir="rtl" data-theme="dark">
-      <body><AppProviders>{children}</AppProviders></body>
+      <body>
+        <AppProviders>{children}</AppProviders>
+      </body>
     </html>
   );
 }

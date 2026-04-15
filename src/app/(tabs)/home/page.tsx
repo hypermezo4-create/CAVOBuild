@@ -9,9 +9,9 @@ import { VideoCard } from '@/components/shared/VideoCard';
 export default function HomePage() {
   return (
     <section className="page stack-xl">
-      <PageHeader title="الرئيسية" subtitle="تجربة CAVO السريعة: رجالي، حريمي، أطفال، عروض، وفيديوهات." />
+      <PageHeader title="الرئيسية" subtitle="رجالي، حريمي، أطفال، عروض، وروابط CAVO الرسمية." />
       <HeroSection />
-      <div className="categories-strip">
+      <div className="categories-strip categories-strip-five">
         {categories.map((category) => (
           <CategoryCard key={category.key} href={category.key === 'videos' ? '/videos' : '/categories'} title={category.label} subtitle={category.subtitle} poster={category.poster} />
         ))}

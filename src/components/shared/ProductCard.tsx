@@ -1,13 +1,7 @@
-"use client";
-
 import Link from 'next/link';
 import type { Product } from '@/lib/catalog';
-import { useAppState } from '@/components/shared/AppProviders';
 
 export function ProductCard({ product }: { product: Product }) {
-  const { favorites, toggleFavorite } = useAppState();
-  const fav = favorites.includes(product.id);
-
   return (
     <article className="product-card glass-card">
       <Link href={`/product/${product.slug}`} className="product-media">
@@ -17,19 +11,18 @@ export function ProductCard({ product }: { product: Product }) {
           {product.isNew ? <span className="tag">NEW</span> : null}
         </div>
       </Link>
-      <div className="product-meta">
+      <div className="product-meta product-meta-simple">
         <div>
           <p className="eyebrow small">{product.brand}</p>
           <h3>{product.title}</h3>
         </div>
-        <button type="button" className="icon-button" onClick={() => toggleFavorite(product.id)}>{fav ? '♥' : '♡'}</button>
       </div>
       <div className="price-row">
         <div>
           <strong>{product.price.toLocaleString()} EGP</strong>
           <span>{product.originalPrice.toLocaleString()} EGP</span>
         </div>
-        <Link href={`/product/${product.slug}`} className="mini-link">عرض</Link>
+        <Link href={`/product/${product.slug}`} className="mini-link">التفاصيل</Link>
       </div>
     </article>
   );

@@ -4,28 +4,37 @@ import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 import type { AppUser, CartItem, ThemeMode } from '@/types';
 import { loadCart, saveCart } from '@/services/cart';
-import { loadUser, saveUser } from '@/services/user';
+import { firebaseAuth } from '@/lib/firebase';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
 
 type AppContextType = {
   theme: ThemeMode;
   setTheme: (theme: ThemeMode) => void;
   user: AppUser | null;
-  login: (payload: AppUser) => void;
-  logout: () => void;
+  isAuthReady: boolean;
+  logout: () => Promise<void>;
   cart: CartItem[];
-  favorites: string[];
   addToCart: (productId: string, size: string) => void;
   removeFromCart: (productId: string, size: string) => void;
-  toggleFavorite: (productId: string) => void;
 };
 
 const AppContext = createContext<AppContextType | null>(null);
 
+function mapFirebaseUser(user: NonNullable<Parameters<Parameters<typeof onAuthStateChanged>[1]>[0]>): AppUser {
+  return {
+    uid: user.uid,
+    name: user.displayName || user.email?.split('@')[0] || 'CAVO Client',
+    email: user.email || '',
+    provider: user.providerData[0]?.providerId || 'password',
+    avatarUrl: user.photoURL,
+  };
+}
+
 export function AppProviders({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<ThemeMode>('dark');
   const [user, setUser] = useState<AppUser | null>(null);
+  const [isAuthReady, setIsAuthReady] = useState(false);
   const [cart, setCart] = useState<CartItem[]>([]);
-  const [favorites, setFavorites] = useState<string[]>([]);
 
   useEffect(() => {
     const storedTheme = window.localStorage.getItem('cavo-theme') as ThemeMode | null;
@@ -33,12 +42,13 @@ export function AppProviders({ children }: { children: ReactNode }) {
     setThemeState(nextTheme);
     document.documentElement.dataset.theme = nextTheme;
     setCart(loadCart());
-    setUser(loadUser());
-    try {
-      setFavorites(JSON.parse(window.localStorage.getItem('cavo-favorites') || '[]'));
-    } catch {
-      setFavorites([]);
-    }
+
+    const unsubscribe = onAuthStateChanged(firebaseAuth, (nextUser) => {
+      setUser(nextUser ? mapFirebaseUser(nextUser) : null);
+      setIsAuthReady(true);
+    });
+
+    return () => unsubscribe();
   }, []);
 
   const setTheme = (nextTheme: ThemeMode) => {
@@ -47,14 +57,9 @@ export function AppProviders({ children }: { children: ReactNode }) {
     window.localStorage.setItem('cavo-theme', nextTheme);
   };
 
-  const login = (payload: AppUser) => {
-    setUser(payload);
-    saveUser(payload);
-  };
-
-  const logout = () => {
+  const logout = async () => {
+    await signOut(firebaseAuth);
     setUser(null);
-    saveUser(null);
   };
 
   const addToCart = (productId: string, size: string) => {
@@ -86,19 +91,9 @@ export function AppProviders({ children }: { children: ReactNode }) {
     });
   };
 
-  const toggleFavorite = (productId: string) => {
-    setFavorites((current) => {
-      const next = current.includes(productId)
-        ? current.filter((id) => id !== productId)
-        : [...current, productId];
-      window.localStorage.setItem('cavo-favorites', JSON.stringify(next));
-      return next;
-    });
-  };
-
   const value = useMemo(
-    () => ({ theme, setTheme, user, login, logout, cart, favorites, addToCart, removeFromCart, toggleFavorite }),
-    [theme, user, cart, favorites]
+    () => ({ theme, setTheme, user, isAuthReady, logout, cart, addToCart, removeFromCart }),
+    [theme, user, isAuthReady, cart]
   );
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

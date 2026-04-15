@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { products, getProductBySlug } from '@/lib/catalog';
+import { getProductBySlug, products } from '@/lib/catalog';
 import { AddToCartBar } from '@/components/shared/AddToCartBar';
 import { PageHeader } from '@/components/shared/PageHeader';
 import { ProductGrid } from '@/components/shared/ProductGrid';
@@ -17,12 +17,16 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
     <main className="page stack-xl product-page-shell">
       <PageHeader title={product.title} subtitle={`${product.brand} • ${product.variant}`} backHref="/categories" />
       <section className="gallery-stack">
-        <article className="hero-gallery glass-card"><img src={product.images[0]} alt={product.title} /></article>
+        <article className="hero-gallery glass-card product-hero-card"><img src={product.images[0]} alt={product.title} /></article>
         <div className="thumb-row">{product.images.slice(1, 5).map((image) => <article key={image} className="thumb-card glass-card"><img src={image} alt={product.title} loading="lazy" /></article>)}</div>
       </section>
       <section className="glass-card product-details stack-lg">
         <div className="product-title-row">
-          <div><p className="eyebrow">{product.brand}</p><h1>{product.title}</h1></div>
+          <div>
+            <p className="eyebrow">{product.brand}</p>
+            <h1>{product.title}</h1>
+            <p className="muted">{product.variant}</p>
+          </div>
           <span className="tag hot">-{product.discount}%</span>
         </div>
         <div className="price-block"><strong>{product.price.toLocaleString()} EGP</strong><span>{product.originalPrice.toLocaleString()} EGP</span></div>
